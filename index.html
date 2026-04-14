@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Calculadora</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="calculator">
+        <input type="text" class="display" value="0" />
+        <div class="buttons">
+            <button class="function" data-action="clear">C</button>
+            <button class="function" data-action="backspace">&larr;</button>
+            <button class="operator" data-action="percent">%</button>
+            <button class="operator" data-action="divide">/</button>
+
+            <button class="digit">7</button>
+            <button class="digit">8</button>
+            <button class="digit">9</button>
+            <button class="operator" data-action="multiply">*</button>
+
+            <button class="digit">4</button>
+            <button class="digit">5</button>
+            <button class="digit">6</button>
+            <button class="operator" data-action="subtract">-</button>
+
+            <button class="digit">1</button>
+            <button class="digit">2</button>
+            <button class="digit">3</button>
+            <button class="operator" data-action="add">+</button>
+
+            <button class="digit zero">0</button>
+            <button class="digit" data-action="decimal">.</button>
+            <button class="equals" data-action="calculate">=</button>
+        </div>
+    </div>
+
+    <script src="src/app.js"></script>
+
+</body>
+</html>
