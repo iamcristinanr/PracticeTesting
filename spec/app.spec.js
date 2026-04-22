@@ -1,28 +1,16 @@
 // spec/app.spec.js
 
-// The core calculation function is defined here for testing purposes
-// because the original `calculateResult` in app.js is not directly accessible.
-// This logic is extracted from the calculateResult function in app.js.
 function calculate(expression) {
     try {
-        // Final cleaning before evaluation
         const sanitizedExpression = expression.replace(/[^0-9+\-*/%.()]/g, '');
+        if (!sanitizedExpression) return '0';
+        if (['+', '-', '*', '/', '%', '.'].includes(sanitizedExpression.slice(-1))) return 'Error';
         
-        if (!sanitizedExpression) {
-            return '0';
-        }
-
-        // Avoid error if the expression ends with an operator
-        if (['+', '-', '*', '/', '%', '.'].includes(sanitizedExpression.slice(-1))) {
-             return 'Error';
-        }
-
         const result = eval(sanitizedExpression);
 
         if (isNaN(result) || !isFinite(result)) {
             return 'Error';
         } else {
-            // Round to avoid floating point inaccuracies
             return parseFloat(result.toFixed(10)).toString();
         }
     } catch (error) {
@@ -30,61 +18,117 @@ function calculate(expression) {
     }
 }
 
-// 1. THE SUITE (The group of tests for the calculator's logic)
+// Suite original para la lógica de la calculadora (respetando los cambios xdescribe/xit)
 describe('Calculator Logic', () => {
-
-  // A nested suite for basic arithmetic operations
   describe('Basic Arithmetic Operations', () => {
-    
-    // 2. FIRST SPEC (Unit Test 1)
     it('should handle addition correctly', () => {
-      // This test checks if the sum of two numbers is calculated correctly.
       expect(calculate('2+2')).toBe('4');
     });
-
-    // 3. SECOND SPEC (Unit Test 2)
     it('should handle subtraction correctly', () => {
-      // This test verifies that the subtraction of two numbers works as expected.
       expect(calculate('5-3')).toBe('2');
     });
-
     it('should handle multiplication correctly', () => {
-      // This test ensures that the multiplication of two numbers is accurate.
       expect(calculate('3*4')).toBe('12');
     });
-
     it('should handle division correctly', () => {
-      // This test checks if the division of two numbers provides the correct result.
       expect(calculate('10/2')).toBe('5');
     });
   });
-
-  // A nested suite for more complex scenarios
   describe('Complex Expressions and Edge Cases', () => {
-
     it('should respect the order of operations', () => {
-      // This test verifies that multiplication is performed before addition.
-      expect(calculate('2+3*4')).toBe('14'); // Expected: 2 + 12 = 14
+      expect(calculate('2+3*4')).toBe('14');
     });
-
     it('should handle decimal numbers correctly', () => {
-      // This test ensures that calculations with decimal numbers are correct.
       expect(calculate('1.5+2.5')).toBe('4');
     });
-
     it('should return "Error" when dividing by zero', () => {
-      // Division by zero results in Infinity in JavaScript. This test checks if our function correctly identifies it as an error.
       expect(calculate('5/0')).toBe('Error');
     });
-
     it('should return "Error" for an expression ending with an operator', () => {
-      // An expression should not end with an operator. This test ensures the function flags it as an error.
       expect(calculate('5+')).toBe('Error');
     });
-
     it('should return "0" for an empty expression', () => {
-        // If the expression is empty, the result should be '0'.
         expect(calculate('')).toBe('0');
     });
   });
+});
+
+// --- NUEVA SUITE: DEMOSTRACIÓN DE DIVERSOS MATCHERS ---
+describe('Demostración de Matchers de Jasmine', () => {
+
+    // toBe: Comprueba igualdad estricta (===). Perfecto para tipos primitivos.
+    it('debería usar toBe para igualdad estricta', () => {
+        expect(calculate('2+2')).toBe('4');
+        expect(calculate('5-3')).not.toBe('5'); // Usando .not para negación
+    });
+
+    // toEqual: Para comparar objetos o arrays (compara contenido, no referencia)
+    it('debería comparar objetos por su valor con toEqual', () => {
+        const obj1 = { a: 1, b: 2 };
+        const obj2 = { a: 1, b: 2 };
+        // expect(obj1).toBe(obj2); // Esto fallaría porque no son el MISMO objeto en memoria.
+        expect(obj1).toEqual(obj2); // Esto pasa porque su contenido es idéntico.
+    });
+
+    // toBeTruthy y toBeFalsy: Para evaluar valores en un contexto booleano
+    it('debería evaluar valores truthy y falsy', () => {
+        expect('Hola').toBeTruthy();      // Un string no vacío es truthy
+        expect(0).toBeFalsy();           // El número 0 es falsy
+        expect('').toBeFalsy();          // Un string vacío es falsy
+        expect(null).toBeFalsy();
+        expect(undefined).toBeFalsy();
+        expect(1).toBeTruthy();
+    });
+
+    // toBeDefined y toBeUndefined: Para comprobar si algo existe
+    it('debería verificar si una variable está definida o no', () => {
+        const resultado = calculate('2+2');
+        let variableNoDefinida;
+        expect(resultado).toBeDefined();
+        expect(variableNoDefinida).toBeUndefined();
+    });
+
+    // toBeNull: Para comprobar si algo es estrictamente null
+    it('debería verificar si un valor es null', () => {
+        let valorNulo = null;
+        let valorNoNulo = 'Hola';
+        expect(valorNulo).toBeNull();
+        expect(valorNoNulo).not.toBeNull();
+    });
+
+    // toBeNaN: Para comprobar si el resultado es Not-a-Number
+    it('debería verificar si un valor es NaN', () => {
+        const resultado = parseInt('esto no es un número');
+        expect(resultado).toBeNaN();
+    });
+
+    // toContain: Para verificar elementos en arrays o substrings en strings
+    it('debería verificar si un elemento está contenido en otro', () => {
+        const miArray = ['manzana', 'pera', 'naranja'];
+        const mensajeError = 'Error: Entrada inválida';
+        expect(miArray).toContain('pera');
+        expect(miArray).not.toContain('plátano'); // Negación con .not
+        expect(mensajeError).toContain('Error');
+    });
+
+    // toMatch: Para comparar strings contra expresiones regulares (RegEx)
+    it('debería verificar si un string coincide con un patrón (RegEx)', () => {
+        const emailValido = 'test@dominio.com';
+        const emailInvalido = 'esto-no-es-un-email';
+        const patronEmail = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+
+        expect(emailValido).toMatch(patronEmail);
+        expect(emailInvalido).not.toMatch(patronEmail);
+    });
+
+    // toThrow: Para verificar que una función lanza un error
+    it('debería verificar si una función lanza un error', () => {
+        const funcionQueLanzaError = () => {
+            throw new Error("¡Esto es un error intencional!");
+        };
+        // Nota: Debes envolver la llamada a la función en otra función anónima.
+        expect(funcionQueLanzaError).toThrow();
+        // También puedes verificar el mensaje exacto del error
+        expect(funcionQueLanzaError).toThrow(new Error("¡Esto es un error intencional!"));
+    });
 });
