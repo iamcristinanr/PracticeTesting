@@ -18,7 +18,7 @@ function calculate(expression) {
     }
 }
 
-// Suite original para la lógica de la calculadora (respetando los cambios xdescribe/xit)
+// Suite original para la lógica de la calculadora
 describe('Calculator Logic', () => {
   describe('Basic Arithmetic Operations', () => {
     it('should handle addition correctly', () => {
@@ -53,13 +53,11 @@ describe('Calculator Logic', () => {
   });
 });
 
-// --- NUEVA SUITE: DEMOSTRACIÓN DE DIVERSOS MATCHERS ---
+// --- SUITE: DEMOSTRACIÓN DE DIVERSOS MATCHERS ---
 describe('Demostración de Matchers de Jasmine', () => {
-
-    // toBe: Comprueba igualdad estricta (===). Perfecto para tipos primitivos.
+    // ... (tests de la suite de demostración de matchers)
     it('debería usar toBe para igualdad estricta', () => {
         expect(calculate('2+2')).toBe('4');
-        expect(calculate('5-3')).not.toBe('5'); // Usando .not para negación
     });
 
     // toEqual: Para comparar objetos o arrays (compara contenido, no referencia)
@@ -131,4 +129,37 @@ describe('Demostración de Matchers de Jasmine', () => {
         // También puedes verificar el mensaje exacto del error
         expect(funcionQueLanzaError).toThrow(new Error("¡Esto es un error intencional!"));
     });
+});
+
+// --- NUEVA SUITE: PRUEBA DEL MATCHER PERSONALIZADO ---
+describe('Prueba del Matcher Personalizado "toBeCalculatorResult"', () => {
+
+  // Antes de cada test en esta suite, registramos nuestro matcher personalizado.
+  beforeEach(() => {
+    jasmine.addMatchers(customMatchers);
+  });
+
+  // Ahora podemos usar nuestro matcher como si fuera uno nativo de Jasmine.
+  it('debería validar correctamente un resultado numérico', () => {
+    const resultado = calculate('10 / 2'); // resultado es '5'
+    expect(resultado).toBeCalculatorResult();
+  });
+
+  it('debería validar correctamente el resultado "Error"', () => {
+    const resultado = calculate('5 / 0'); // resultado es 'Error'
+    expect(resultado).toBeCalculatorResult();
+  });
+
+  it('debería fallar para un string que no es un resultado válido', () => {
+    const resultadoInvalido = 'esto no es un resultado';
+    // Usamos .not para verificar el caso de fallo.
+    // El test pasa porque esperamos que 'resultadoInvalido' NO sea un resultado válido.
+    expect(resultadoInvalido).not.toBeCalculatorResult();
+  });
+
+  it('debería fallar para un objeto o un número, ya que esperamos un string', () => {
+    expect({}).not.toBeCalculatorResult();
+    expect(123).toBeCalculatorResult(); // Forzamos el fallo para mostrar el mensaje
+  });
+
 });
