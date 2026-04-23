@@ -130,3 +130,34 @@ describe('Demostración de Matchers de Jasmine', () => {
         expect(funcionQueLanzaError).toThrow(new Error("¡Esto es un error intencional!"));
     });
 });
+
+// --- NUEVA SUITE: PRUEBA DEL MATCHER PERSONALIZADO ---
+describe('Prueba del Matcher Personalizado "toBeCalculatorResult"', () => {
+
+  // Antes de cada test en esta suite, registramos nuestro matcher personalizado.
+  beforeEach(() => {
+    jasmine.addMatchers(customMatchers);
+  });
+
+  // Ahora podemos usar nuestro matcher como si fuera uno nativo de Jasmine.
+  it('debería validar correctamente un resultado numérico', () => {
+    const resultado = calculate('10 / 2'); // resultado es '5'
+    expect(resultado).toBeCalculatorResult();
+  });
+
+  it('debería validar correctamente el resultado "Error"', () => {
+    const resultado = calculate('5 / 0'); // resultado es 'Error'
+    expect(resultado).toBeCalculatorResult();
+  });
+
+  it('debería fallar para un string que no es un resultado válido', () => {
+    const resultadoInvalido = 'esto no es un resultado';
+    expect(resultadoInvalido).not.toBeCalculatorResult();
+  });
+
+  it('debería fallar para un objeto o un número, ya que esperamos un string', () => {
+    expect({}).not.toBeCalculatorResult();
+    expect(123).not.toBeCalculatorResult();
+  });
+
+});
