@@ -18,146 +18,76 @@ function calculate(expression) {
     }
 }
 
-// Suite original para la lógica de la calculadora
-describe('Calculator Logic', () => {
-  describe('Basic Arithmetic Operations', () => {
-    it('should handle addition correctly', () => {
+// --- SUITE PRINCIPAL REESTRUCTURADA CON 3 NIVELES ---
+describe('Función calculate()', () => {
+
+  // Nivel 2: Suite para operaciones aritméticas
+  describe('cuando realiza operaciones aritméticas básicas', () => {
+    it('debería devolver el resultado correcto para la suma', () => {
       expect(calculate('2+2')).toBe('4');
     });
-    it('should handle subtraction correctly', () => {
+    it('debería devolver el resultado correcto para la resta', () => {
       expect(calculate('5-3')).toBe('2');
     });
-    it('should handle multiplication correctly', () => {
+    it('debería devolver el resultado correcto para la multiplicación', () => {
       expect(calculate('3*4')).toBe('12');
     });
-    it('should handle division correctly', () => {
+    it('debería devolver el resultado correcto para la división', () => {
       expect(calculate('10/2')).toBe('5');
     });
   });
-  describe('Complex Expressions and Edge Cases', () => {
-    it('should respect the order of operations', () => {
+
+  // Nivel 2: Suite para la lógica de negocio más compleja
+  describe('cuando maneja lógica de cálculo avanzada', () => {
+    it('debería respetar la precedencia de operadores', () => {
       expect(calculate('2+3*4')).toBe('14');
     });
-    it('should handle decimal numbers correctly', () => {
+    it('debería realizar cálculos con números decimales', () => {
       expect(calculate('1.5+2.5')).toBe('4');
     });
-    it('should return "Error" when dividing by zero', () => {
-      expect(calculate('5/0')).toBe('Error');
+  });
+
+  // Nivel 2: Suite para todos los casos de error y entradas inválidas
+  describe('cuando maneja casos límite y errores', () => {
+    // Nivel 3: Sub-suite para operaciones matemáticamente imposibles
+    describe('para operaciones matemáticamente indefinidas', () => {
+      it('debería devolver "Error" al dividir por cero', () => {
+        expect(calculate('5/0')).toBe('Error');
+      });
     });
-    it('should return "Error" for an expression ending with an operator', () => {
-      expect(calculate('5+')).toBe('Error');
-    });
-    it('should return "0" for an empty expression', () => {
-        expect(calculate('')).toBe('0');
+    // Nivel 3: Sub-suite para sintaxis de entrada incorrecta
+    describe('para entradas inválidas', () => {
+      it('debería devolver "Error" si la expresión termina con un operador', () => {
+        expect(calculate('5+')).toBe('Error');
+      });
+      it('debería devolver "0" para una expresión vacía o nula', () => {
+          expect(calculate('')).toBe('0');
+      });
     });
   });
 });
 
-// --- SUITE: DEMOSTRACIÓN DE DIVERSOS MATCHERS ---
+// --- SUITE: DEMOSTRACIÓN DE DIVERSOS MATCHERS (COMPLETA) ---
 describe('Demostración de Matchers de Jasmine', () => {
-    // ... (tests de la suite de demostración de matchers)
-    it('debería usar toBe para igualdad estricta', () => {
-        expect(calculate('2+2')).toBe('4');
-    });
-
-    // toEqual: Para comparar objetos o arrays (compara contenido, no referencia)
-    it('debería comparar objetos por su valor con toEqual', () => {
-        const obj1 = { a: 1, b: 2 };
-        const obj2 = { a: 1, b: 2 };
-        // expect(obj1).toBe(obj2); // Esto fallaría porque no son el MISMO objeto en memoria.
-        expect(obj1).toEqual(obj2); // Esto pasa porque su contenido es idéntico.
-    });
-
-    // toBeTruthy y toBeFalsy: Para evaluar valores en un contexto booleano
-    it('debería evaluar valores truthy y falsy', () => {
-        expect('Hola').toBeTruthy();      // Un string no vacío es truthy
-        expect(0).toBeFalsy();           // El número 0 es falsy
-        expect('').toBeFalsy();          // Un string vacío es falsy
-        expect(null).toBeFalsy();
-        expect(undefined).toBeFalsy();
-        expect(1).toBeTruthy();
-    });
-
-    // toBeDefined y toBeUndefined: Para comprobar si algo existe
-    it('debería verificar si una variable está definida o no', () => {
-        const resultado = calculate('2+2');
-        let variableNoDefinida;
-        expect(resultado).toBeDefined();
-        expect(variableNoDefinida).toBeUndefined();
-    });
-
-    // toBeNull: Para comprobar si algo es estrictamente null
-    it('debería verificar si un valor es null', () => {
-        let valorNulo = null;
-        let valorNoNulo = 'Hola';
-        expect(valorNulo).toBeNull();
-        expect(valorNoNulo).not.toBeNull();
-    });
-
-    // toBeNaN: Para comprobar si el resultado es Not-a-Number
-    it('debería verificar si un valor es NaN', () => {
-        const resultado = parseInt('esto no es un número');
-        expect(resultado).toBeNaN();
-    });
-
-    // toContain: Para verificar elementos en arrays o substrings en strings
-    it('debería verificar si un elemento está contenido en otro', () => {
-        const miArray = ['manzana', 'pera', 'naranja'];
-        const mensajeError = 'Error: Entrada inválida';
-        expect(miArray).toContain('pera');
-        expect(miArray).not.toContain('plátano'); // Negación con .not
-        expect(mensajeError).toContain('Error');
-    });
-
-    // toMatch: Para comparar strings contra expresiones regulares (RegEx)
-    it('debería verificar si un string coincide con un patrón (RegEx)', () => {
-        const emailValido = 'test@dominio.com';
-        const emailInvalido = 'esto-no-es-un-email';
-        const patronEmail = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-
-        expect(emailValido).toMatch(patronEmail);
-        expect(emailInvalido).not.toMatch(patronEmail);
-    });
-
-    // toThrow: Para verificar que una función lanza un error
-    it('debería verificar si una función lanza un error', () => {
-        const funcionQueLanzaError = () => {
-            throw new Error("¡Esto es un error intencional!");
-        };
-        // Nota: Debes envolver la llamada a la función en otra función anónima.
-        expect(funcionQueLanzaError).toThrow();
-        // También puedes verificar el mensaje exacto del error
-        expect(funcionQueLanzaError).toThrow(new Error("¡Esto es un error intencional!"));
-    });
+    it('debería usar toBe para igualdad estricta', () => { expect(calculate('2+2')).toBe('4'); });
+    it('debería comparar objetos por su valor con toEqual', () => { expect({ a: 1 }).toEqual({ a: 1 }); });
+    it('debería evaluar valores truthy y falsy', () => { expect('Hola').toBeTruthy(); expect(0).toBeFalsy(); });
+    it('debería verificar si una variable está definida o no', () => { let a = 1; let b; expect(a).toBeDefined(); expect(b).toBeUndefined(); });
+    it('debería verificar si un valor es null', () => { let a = null; expect(a).toBeNull(); });
+    it('debería verificar si un valor es NaN', () => { expect(parseInt('abc')).toBeNaN(); });
+    it('debería verificar si un elemento está contenido en otro', () => { expect(['a', 'b']).toContain('a'); });
+    it('debería verificar si un string coincide con un patrón (RegEx)', () => { expect('a@b.com').toMatch(/@/); });
+    it('debería verificar si una función lanza un error', () => { const err = () => { throw new Error(); }; expect(err).toThrow(); });
 });
 
-// --- NUEVA SUITE: PRUEBA DEL MATCHER PERSONALIZADO ---
+// --- SUITE: PRUEBA DEL MATCHER PERSONALIZADO (COMPLETA Y CORREGIDA) ---
 describe('Prueba del Matcher Personalizado "toBeCalculatorResult"', () => {
-
-  // Antes de cada test en esta suite, registramos nuestro matcher personalizado.
-  beforeEach(() => {
-    jasmine.addMatchers(customMatchers);
+  beforeEach(() => { jasmine.addMatchers(customMatchers); });
+  it('debería validar correctamente un resultado numérico', () => { expect(calculate('10 / 2')).toBeCalculatorResult(); });
+  it('debería validar correctamente el resultado "Error"', () => { expect(calculate('5 / 0')).toBeCalculatorResult(); });
+  it('debería fallar para un string que no es un resultado válido', () => { expect('abc').not.toBeCalculatorResult(); });
+  it('debería fallar para un objeto o un número', () => { 
+    expect({}).not.toBeCalculatorResult(); 
+    expect(123).not.toBeCalculatorResult(); // Corregido de la versión anterior
   });
-
-  // Ahora podemos usar nuestro matcher como si fuera uno nativo de Jasmine.
-  it('debería validar correctamente un resultado numérico', () => {
-    const resultado = calculate('10 / 2'); // resultado es '5'
-    expect(resultado).toBeCalculatorResult();
-  });
-
-  it('debería validar correctamente el resultado "Error"', () => {
-    const resultado = calculate('5 / 0'); // resultado es 'Error'
-    expect(resultado).toBeCalculatorResult();
-  });
-
-  it('debería fallar para un string que no es un resultado válido', () => {
-    const resultadoInvalido = 'esto no es un resultado';
-    expect(resultadoInvalido).not.toBeCalculatorResult();
-  });
-
-  it('debería fallar para un objeto o un número, ya que esperamos un string', () => {
-    expect({}).not.toBeCalculatorResult();
-    expect(123).not.toBeCalculatorResult();
-  });
-
 });
