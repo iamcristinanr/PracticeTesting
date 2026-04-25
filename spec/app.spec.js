@@ -5,69 +5,38 @@ function calculate(expression) {
         const sanitizedExpression = expression.replace(/[^0-9+\-*/%.()]/g, '');
         if (!sanitizedExpression) return '0';
         if (['+', '-', '*', '/', '%', '.'].includes(sanitizedExpression.slice(-1))) return 'Error';
-        
         const result = eval(sanitizedExpression);
-
-        if (isNaN(result) || !isFinite(result)) {
-            return 'Error';
-        } else {
-            return parseFloat(result.toFixed(10)).toString();
-        }
+        if (isNaN(result) || !isFinite(result)) return 'Error';
+        return parseFloat(result.toFixed(10)).toString();
     } catch (error) {
         return 'Error';
     }
 }
 
-// --- SUITE PRINCIPAL REESTRUCTURADA CON 3 NIVELES ---
+// --- SUITE 1: LÓGICA DE LA CALCULADORA (COMPLETA) ---
 describe('Función calculate()', () => {
-
-  // Nivel 2: Suite para operaciones aritméticas
   describe('cuando realiza operaciones aritméticas básicas', () => {
-    it('debería devolver el resultado correcto para la suma', () => {
-      expect(calculate('2+2')).toBe('4');
-    });
-    it('debería devolver el resultado correcto para la resta', () => {
-      expect(calculate('5-3')).toBe('2');
-    });
-    it('debería devolver el resultado correcto para la multiplicación', () => {
-      expect(calculate('3*4')).toBe('12');
-    });
-    it('debería devolver el resultado correcto para la división', () => {
-      expect(calculate('10/2')).toBe('5');
-    });
+    it('debería devolver el resultado correcto para la suma', () => { expect(calculate('2+2')).toBe('4'); });
+    it('debería devolver el resultado correcto para la resta', () => { expect(calculate('5-3')).toBe('2'); });
+    it('debería devolver el resultado correcto para la multiplicación', () => { expect(calculate('3*4')).toBe('12'); });
+    it('debería devolver el resultado correcto para la división', () => { expect(calculate('10/2')).toBe('5'); });
   });
-
-  // Nivel 2: Suite para la lógica de negocio más compleja
   describe('cuando maneja lógica de cálculo avanzada', () => {
-    it('debería respetar la precedencia de operadores', () => {
-      expect(calculate('2+3*4')).toBe('14');
-    });
-    it('debería realizar cálculos con números decimales', () => {
-      expect(calculate('1.5+2.5')).toBe('4');
-    });
+    it('debería respetar la precedencia de operadores', () => { expect(calculate('2+3*4')).toBe('14'); });
+    it('debería realizar cálculos con números decimales', () => { expect(calculate('1.5+2.5')).toBe('4'); });
   });
-
-  // Nivel 2: Suite para todos los casos de error y entradas inválidas
   describe('cuando maneja casos límite y errores', () => {
-    // Nivel 3: Sub-suite para operaciones matemáticamente imposibles
     describe('para operaciones matemáticamente indefinidas', () => {
-      it('debería devolver "Error" al dividir por cero', () => {
-        expect(calculate('5/0')).toBe('Error');
-      });
+      it('debería devolver "Error" al dividir por cero', () => { expect(calculate('5/0')).toBe('Error'); });
     });
-    // Nivel 3: Sub-suite para sintaxis de entrada incorrecta
     describe('para entradas inválidas', () => {
-      it('debería devolver "Error" si la expresión termina con un operador', () => {
-        expect(calculate('5+')).toBe('Error');
-      });
-      it('debería devolver "0" para una expresión vacía o nula', () => {
-          expect(calculate('')).toBe('0');
-      });
+      it('debería devolver "Error" si la expresión termina con un operador', () => { expect(calculate('5+')).toBe('Error'); });
+      it('debería devolver "0" para una expresión vacía o nula', () => { expect(calculate('')).toBe('0'); });
     });
   });
 });
 
-// --- SUITE: DEMOSTRACIÓN DE DIVERSOS MATCHERS (COMPLETA) ---
+// --- SUITE 2: DEMOSTRACIÓN DE MATCHERS (COMPLETA) ---
 describe('Demostración de Matchers de Jasmine', () => {
     it('debería usar toBe para igualdad estricta', () => { expect(calculate('2+2')).toBe('4'); });
     it('debería comparar objetos por su valor con toEqual', () => { expect({ a: 1 }).toEqual({ a: 1 }); });
@@ -80,14 +49,45 @@ describe('Demostración de Matchers de Jasmine', () => {
     it('debería verificar si una función lanza un error', () => { const err = () => { throw new Error(); }; expect(err).toThrow(); });
 });
 
-// --- SUITE: PRUEBA DEL MATCHER PERSONALIZADO (COMPLETA Y CORREGIDA) ---
+// --- SUITE 3: MATCHER PERSONALIZADO (COMPLETA) ---
 describe('Prueba del Matcher Personalizado "toBeCalculatorResult"', () => {
   beforeEach(() => { jasmine.addMatchers(customMatchers); });
   it('debería validar correctamente un resultado numérico', () => { expect(calculate('10 / 2')).toBeCalculatorResult(); });
   it('debería validar correctamente el resultado "Error"', () => { expect(calculate('5 / 0')).toBeCalculatorResult(); });
   it('debería fallar para un string que no es un resultado válido', () => { expect('abc').not.toBeCalculatorResult(); });
-  it('debería fallar para un objeto o un número', () => { 
-    expect({}).not.toBeCalculatorResult(); 
-    expect(123).not.toBeCalculatorResult(); // Corregido de la versión anterior
+  it('debería fallar para un objeto o un número', () => { expect({}).not.toBeCalculatorResult(); expect(123).not.toBeCalculatorResult(); });
+});
+
+// --- SUITE 4: CICLO DE VIDA (COMPLETA) ---
+describe('Demostración del Ciclo de Vida (Setup y Teardown)', () => {
+  let contador;
+  beforeAll(() => { console.log('--- Inicia Suite Ciclo de Vida ---'); contador = 0; });
+  beforeEach(() => { contador++; console.log(`beforeEach: contador es ${contador}`); });
+  afterEach(() => { console.log(`afterEach: contador fue ${contador}`); });
+  afterAll(() => { contador = 0; console.log('--- Finaliza Suite Ciclo de Vida ---'); });
+  it('debería ser el primer test', () => { console.log('Test #1'); expect(contador).toBe(1); });
+  it('debería ser el segundo test', () => { console.log('Test #2'); expect(contador).toBe(2); });
+});
+
+// --- SUITE 5: PRUEBAS DEL DOM (COMPLETA) ---
+describe('Demostración de Pruebas del DOM', () => {
+  let miDiv;
+  beforeEach(() => {
+    miDiv = document.createElement('div');
+    miDiv.id = 'test-div';
+    document.body.appendChild(miDiv);
+  });
+  afterEach(() => {
+    document.body.removeChild(miDiv);
+    miDiv = null;
+  });
+  it('debería crear y añadir un elemento al DOM', () => {
+    expect(document.getElementById('test-div')).not.toBeNull();
+  });
+  it('debería permitir modificar el contenido y verificar el cambio', () => {
+    const el = document.getElementById('test-div');
+
+    el.innerText = 'Contenido Cambiado';
+    expect(el.innerText).toBe('Contenido Cambiado');
   });
 });
