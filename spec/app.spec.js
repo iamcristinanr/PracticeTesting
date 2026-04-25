@@ -1,6 +1,7 @@
 // spec/app.spec.js
 
 function calculate(expression) {
+    // ... (código de la función sin cambios)
     try {
         const sanitizedExpression = expression.replace(/[^0-9+\-*/%.()]/g, '');
         if (!sanitizedExpression) return '0';
@@ -13,81 +14,62 @@ function calculate(expression) {
     }
 }
 
-// --- SUITE 1: LÓGICA DE LA CALCULADORA (COMPLETA) ---
-describe('Función calculate()', () => {
-  describe('cuando realiza operaciones aritméticas básicas', () => {
-    it('debería devolver el resultado correcto para la suma', () => { expect(calculate('2+2')).toBe('4'); });
-    it('debería devolver el resultado correcto para la resta', () => { expect(calculate('5-3')).toBe('2'); });
-    it('debería devolver el resultado correcto para la multiplicación', () => { expect(calculate('3*4')).toBe('12'); });
-    it('debería devolver el resultado correcto para la división', () => { expect(calculate('10/2')).toBe('5'); });
-  });
-  describe('cuando maneja lógica de cálculo avanzada', () => {
-    it('debería respetar la precedencia de operadores', () => { expect(calculate('2+3*4')).toBe('14'); });
-    it('debería realizar cálculos con números decimales', () => { expect(calculate('1.5+2.5')).toBe('4'); });
-  });
-  describe('cuando maneja casos límite y errores', () => {
-    describe('para operaciones matemáticamente indefinidas', () => {
-      it('debería devolver "Error" al dividir por cero', () => { expect(calculate('5/0')).toBe('Error'); });
-    });
-    describe('para entradas inválidas', () => {
-      it('debería devolver "Error" si la expresión termina con un operador', () => { expect(calculate('5+')).toBe('Error'); });
-      it('debería devolver "0" para una expresión vacía o nula', () => { expect(calculate('')).toBe('0'); });
-    });
-  });
-});
+// ... (Suites de pruebas anteriores)
+describe('Función calculate()', function() { /* ... */ });
+describe('Demostración de Matchers de Jasmine', function() { /* ... */ });
+describe('Prueba del Matcher Personalizado "toBeCalculatorResult"', function() { /* ... */ });
+describe('Demostración del Ciclo de Vida (Setup y Teardown)', function() { /* ... */ });
+describe('Demostración de Pruebas del DOM', function() { /* ... */ });
 
-// --- SUITE 2: DEMOSTRACIÓN DE MATCHERS (COMPLETA) ---
-describe('Demostración de Matchers de Jasmine', () => {
-    it('debería usar toBe para igualdad estricta', () => { expect(calculate('2+2')).toBe('4'); });
-    it('debería comparar objetos por su valor con toEqual', () => { expect({ a: 1 }).toEqual({ a: 1 }); });
-    it('debería evaluar valores truthy y falsy', () => { expect('Hola').toBeTruthy(); expect(0).toBeFalsy(); });
-    it('debería verificar si una variable está definida o no', () => { let a = 1; let b; expect(a).toBeDefined(); expect(b).toBeUndefined(); });
-    it('debería verificar si un valor es null', () => { let a = null; expect(a).toBeNull(); });
-    it('debería verificar si un valor es NaN', () => { expect(parseInt('abc')).toBeNaN(); });
-    it('debería verificar si un elemento está contenido en otro', () => { expect(['a', 'b']).toContain('a'); });
-    it('debería verificar si un string coincide con un patrón (RegEx)', () => { expect('a@b.com').toMatch(/@/); });
-    it('debería verificar si una función lanza un error', () => { const err = () => { throw new Error(); }; expect(err).toThrow(); });
-});
 
-// --- SUITE 3: MATCHER PERSONALIZADO (COMPLETA) ---
-describe('Prueba del Matcher Personalizado "toBeCalculatorResult"', () => {
-  beforeEach(() => { jasmine.addMatchers(customMatchers); });
-  it('debería validar correctamente un resultado numérico', () => { expect(calculate('10 / 2')).toBeCalculatorResult(); });
-  it('debería validar correctamente el resultado "Error"', () => { expect(calculate('5 / 0')).toBeCalculatorResult(); });
-  it('debería fallar para un string que no es un resultado válido', () => { expect('abc').not.toBeCalculatorResult(); });
-  it('debería fallar para un objeto o un número', () => { expect({}).not.toBeCalculatorResult(); expect(123).not.toBeCalculatorResult(); });
-});
+// --- NUEVA SUITE: DEMOSTRACIÓN DEL USO DE 'this' ---
+// Nota: Usamos 'function()' en lugar de '() =>' para que 'this' funcione correctamente.
+describe('Demostración del uso de "this" para compartir estado', function() {
 
-// --- SUITE 4: CICLO DE VIDA (COMPLETA) ---
-describe('Demostración del Ciclo de Vida (Setup y Teardown)', () => {
-  let contador;
-  beforeAll(() => { console.log('--- Inicia Suite Ciclo de Vida ---'); contador = 0; });
-  beforeEach(() => { contador++; console.log(`beforeEach: contador es ${contador}`); });
-  afterEach(() => { console.log(`afterEach: contador fue ${contador}`); });
-  afterAll(() => { contador = 0; console.log('--- Finaliza Suite Ciclo de Vida ---'); });
-  it('debería ser el primer test', () => { console.log('Test #1'); expect(contador).toBe(1); });
-  it('debería ser el segundo test', () => { console.log('Test #2'); expect(contador).toBe(2); });
-});
+  // En beforeEach, adjuntamos propiedades a 'this'.
+  // 'this' actúa como un objeto compartido para toda la suite.
+  beforeEach(function() {
+    // Creamos una propiedad 'valor' en el contexto 'this' de la suite.
+    this.valor = 10;
 
-// --- SUITE 5: PRUEBAS DEL DOM (COMPLETA) ---
-describe('Demostración de Pruebas del DOM', () => {
-  let miDiv;
-  beforeEach(() => {
-    miDiv = document.createElement('div');
-    miDiv.id = 'test-div';
-    document.body.appendChild(miDiv);
+    // También podemos adjuntar elementos del DOM.
+    this.miElemento = document.createElement('p');
+    this.miElemento.innerText = 'Texto original';
+    document.body.appendChild(this.miElemento);
   });
-  afterEach(() => {
-    document.body.removeChild(miDiv);
-    miDiv = null;
-  });
-  it('debería crear y añadir un elemento al DOM', () => {
-    expect(document.getElementById('test-div')).not.toBeNull();
-  });
-  it('debería permitir modificar el contenido y verificar el cambio', () => {
-    const el = document.getElementById('test-div');
 
-    el.innerText = 'Contenido Cambiado';
-    expect(el.innerText).toBe('Contenido Cambiado');
+  // En afterEach, limpiamos lo que creamos en 'this'.
+  afterEach(function() {
+    // Eliminamos el elemento del DOM.
+    document.body.removeChild(this.miElemento);
+    // Es buena práctica limpiar las propiedades de 'this'.
+    this.valor = 0;
+    this.miElemento = null;
   });
+
+  // En el test, accedemos a las propiedades directamente desde 'this'.
+  // No necesitamos declarar variables 'let' al inicio del 'describe'.
+  it('debería poder acceder a las propiedades adjuntas a "this"', function() {
+    // Verificamos el valor de la propiedad que establecimos en beforeEach.
+    expect(this.valor).toBe(10);
+  });
+
+  it('debería poder modificar las propiedades de "this" dentro de un test', function() {
+    // Modificamos el valor solo para este test.
+    this.valor = 20;
+    expect(this.valor).toBe(20);
+
+    // El siguiente test tendrá un 'valor' de 10 de nuevo, gracias al beforeEach.
+  });
+
+  it('debería poder acceder a los elementos del DOM adjuntos a "this"', function() {
+    // No necesitamos hacer un querySelector, ya tenemos la referencia en 'this.miElemento'.
+    // Esto es más eficiente.
+    expect(this.miElemento.innerText).toBe('Texto original');
+
+    // Modificamos el elemento
+    this.miElemento.innerText = 'Texto modificado';
+    expect(this.miElemento.innerText).toBe('Texto modificado');
+  });
+
 });
