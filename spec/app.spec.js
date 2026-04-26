@@ -123,4 +123,32 @@ describe('SUITE 6: Demostración de Spies', function() {
     expect(SpyLogger.log).toHaveBeenCalledWith('R: 15');
     expect(SpyLogger.log).toHaveBeenCalledTimes(1);
   });
+
+
+// ---------------------------------------------------------------------------------
+// SUITE 7: SPIES EN PROTOTIPOS (Caso Real)
+// ---------------------------------------------------------------------------------
+    describe('SUITE 7: Validación de integración con Clase Calculator', function() {
+
+        beforeEach(function() {
+            // Si ya existe un espía (por un test anterior), Jasmine puede quejarse.
+            // Usamos el prototipo de forma limpia:
+            if (!jasmine.isSpy(Calculator.prototype.multiply)) {
+                spyOn(Calculator.prototype, 'multiply').and.callThrough();
+            }
+        });
+
+        it('debería llamar al método multiply del prototipo', function() {
+            const calc = new Calculator();
+            calc.multiply(5, 5);
+            expect(Calculator.prototype.multiply).toHaveBeenCalled();
+        });
+
+        it('debería permitirnos falsear el resultado', function() {
+            // En lugar de un nuevo spyOn, modificamos el comportamiento del que ya existe
+            Calculator.prototype.multiply.and.returnValue(99);
+            const calc = new Calculator();
+            expect(calc.multiply(2, 2)).toBe(99);
+        });
+    });
 });
