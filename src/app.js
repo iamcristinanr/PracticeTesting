@@ -10,9 +10,15 @@ class Calculator {
         return 'ID_REAL';
     }
 
-    // Getter para la versión
+    // Getter asíncrono para la versión
     get version() {
-        return '1.0';
+        return fetch('version.json') // Devuelve una promesa
+            .then(function(result) {
+                return result.json(); // Devuelve otra promesa
+            })
+            .then(function(data) {
+                return data.version; // Devuelve el valor final
+            });
     }
 }
 
@@ -21,6 +27,27 @@ class Calculator {
 document.addEventListener('DOMContentLoaded', function() {
     const display = document.querySelector('.display');
     const buttons = document.querySelector('.buttons');
+    const calculatorElement = document.querySelector('.calculator'); // Guardamos la referencia
+
+    // Solo ejecutar código del DOM si estamos en la aplicación real
+    if (calculatorElement) {
+        const versionDisplay = document.createElement('div'); // Elemento para la versión
+        versionDisplay.id = 'version-display';
+        versionDisplay.style.textAlign = 'center';
+        versionDisplay.style.marginTop = '10px';
+        calculatorElement.appendChild(versionDisplay);
+
+        const calculadora = new Calculator();
+
+        // --- Mostrar Versión (Asíncrono) ---
+        function showVersion() {
+            calculadora.version.then(function(v) {
+                versionDisplay.innerText = `v${v}`;
+            });
+        }
+        showVersion();
+    }
+
 
     // --- Lógica de Clics en Botones ---
     if (buttons && display) {

@@ -251,6 +251,8 @@ describe('SUITE 11: Espiando Propiedades: Getters con spyOnProperty', function()
 
     // spyOnProperty(obj, 'propiedad', 'get')
     // Permite interceptar el acceso a una propiedad que usa un getter.
+    // spyOnProperty(obj, 'propiedad', 'get')
+    // Permite interceptar el acceso a una propiedad que usa un getter.
     it('debería espiar un getter y falsear su valor de retorno', function() {
         // Espiamos el getter 'version' del prototipo de Calculator.
         // El 'get' indica que estamos interceptando la lectura de la propiedad.
@@ -264,5 +266,72 @@ describe('SUITE 11: Espiando Propiedades: Getters con spyOnProperty', function()
 
         // El espía también registra que la propiedad fue accedida.
         expect(spy).toHaveBeenCalled();
+    });
+});
+
+// ---------------------------------------------------------------------------------
+// SUITE 12: TESTING CÓDIGO ASÍNCRONO (PROMESAS)
+// ---------------------------------------------------------------------------------
+describe('SUITE 12: Testing Código Asíncrono (Promesas)', function() {
+    let calculadora;
+    beforeEach(function() {
+        calculadora = new Calculator();
+    });
+
+    // Test con el callback 'done'
+    it('debería obtener la versión usando el callback done', function(done) {
+        spyOn(window, 'fetch').and.returnValue(Promise.resolve(
+            new Response('{ "version": "0.1.2" }')
+        ));
+
+        calculadora.version.then(function(version) {
+            expect(version).toBe('0.1.2');
+            done();
+        });
+    });
+
+    // Test con sintaxis async/await
+    it('debería obtener la versión usando async/await', async function() {
+        spyOn(window, 'fetch').and.returnValue(Promise.resolve(
+            new Response('{ "version": "0.2.3" }')
+        ));
+
+        const version = await calculadora.version;
+        expect(version).toBe('0.2.3');
+    });
+});
+
+// ---------------------------------------------------------------------------------
+// SUITE 13: COMPARATIVA DE ASINCRONÍA: done vs async/await
+// ---------------------------------------------------------------------------------
+describe('SUITE 13: Comparativa de Asincronía: done vs async/await', function() {
+    let calculadora;
+    beforeEach(function() {
+        calculadora = new Calculator();
+        // Simulamos una función que devuelve una promesa después de un pequeño retardo
+        spyOn(Calculator.prototype, 'add').and.callFake(function(a, b) {
+            return new Promise(function(resolve) {
+                setTimeout(function() {
+                    resolve(a + b);
+                }, 50);
+            });
+        });
+    });
+
+    // Enfoque Clásico: Callback 'done'
+    // Necesitas pasar 'done' como argumento y llamarlo explícitamente.
+    it('debería sumar de forma asíncrona usando done()', function(done) {
+        calculadora.add(2, 3).then(function(resultado) {
+            expect(resultado).toBe(5);
+            done(); // <-- Esencial: avisa a Jasmine que el test ha terminado.
+        });
+    });
+
+    // Enfoque Moderno: async/await
+    // El código es más limpio y se lee de forma secuencial. No se necesita 'done'.
+    it('debería sumar de forma asíncrona usando async/await', async function() {
+        const resultado = await calculadora.add(2, 3);
+        expect(resultado).toBe(5);
+        // <-- No hay 'done()'. Jasmine gestiona la espera automáticamente.
     });
 });
