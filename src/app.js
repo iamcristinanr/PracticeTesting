@@ -9,6 +9,11 @@ class Calculator {
         // Para el ejemplo, devolvemos un valor simple.
         return 'ID_REAL';
     }
+
+    // Getter para la versión
+    get version() {
+        return '1.0';
+    }
 }
 
 

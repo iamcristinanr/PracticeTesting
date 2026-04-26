@@ -239,3 +239,30 @@ describe('SUITE 10: Control de Errores y Aislamiento: throwError', function() {
         }).toThrowError('ERROR_SIMULADO');
     });
 });
+
+// ---------------------------------------------------------------------------------
+// SUITE 11: ESPIANDO PROPIEDADES: GETTERS
+// ---------------------------------------------------------------------------------
+describe('SUITE 11: Espiando Propiedades: Getters con spyOnProperty', function() {
+    let calculadora;
+    beforeEach(function() {
+        calculadora = new Calculator();
+    });
+
+    // spyOnProperty(obj, 'propiedad', 'get')
+    // Permite interceptar el acceso a una propiedad que usa un getter.
+    it('debería espiar un getter y falsear su valor de retorno', function() {
+        // Espiamos el getter 'version' del prototipo de Calculator.
+        // El 'get' indica que estamos interceptando la lectura de la propiedad.
+        const spy = spyOnProperty(Calculator.prototype, 'version', 'get');
+
+        // Forzamos que el getter devuelva una versión "beta".
+        spy.and.returnValue('2.0-beta');
+
+        // Al acceder a la propiedad 'version', obtenemos el valor del espía.
+        expect(calculadora.version).toBe('2.0-beta');
+
+        // El espía también registra que la propiedad fue accedida.
+        expect(spy).toHaveBeenCalled();
+    });
+});
