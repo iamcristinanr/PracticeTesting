@@ -4,6 +4,11 @@ class Calculator {
     subtract(a, b) { return a - b; }
     multiply(a, b) { return a * b; }
     divide(a, b) { return b === 0 ? 'Error' : a / b; }
+    generateId() {
+        // En un caso real, esto podría generar un ID único.
+        // Para el ejemplo, devolvemos un valor simple.
+        return 'ID_REAL';
+    }
 }
 
 

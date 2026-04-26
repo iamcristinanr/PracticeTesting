@@ -176,3 +176,41 @@ describe('SUITE 8: Spying con Implementación Real: and.callThrough()', function
         expect(result).toBe(25);
     });
 });
+
+// ---------------------------------------------------------------------------------
+// SUITE 9: CONTROLANDO EL RESULTADO CON RETURN VALUES
+// ---------------------------------------------------------------------------------
+describe('SUITE 9: Controlando el resultado: Return Values', function() {
+    let calculadora;
+    beforeEach(function() {
+        calculadora = new Calculator();
+    });
+
+    // 1. .and.returnValue(valor)
+    // Fuerza a la función espiada a devolver siempre el mismo valor, ignorando su lógica original.
+    it('debería usar el valor devuelto por el espía con .and.returnValue()', function() {
+        // Espiamos el método 'add' del prototipo.
+        const spy = spyOn(Calculator.prototype, 'add');
+        
+        // Forzamos que siempre devuelva 100, sin importar los argumentos.
+        spy.and.returnValue(100);
+
+        // Aunque 2 + 2 es 4, el espía fuerza el resultado a 100.
+        expect(calculadora.add(2, 2)).toBe(100);
+    });
+
+    // 2. .and.returnValues(v1, v2, ...)
+    // Ideal cuando la función se llama varias veces y necesitas que cada vez responda algo distinto.
+    it('debería devolver valores distintos en cada llamada con .and.returnValues()', function() {
+        // Espiamos el método 'generateId' del prototipo.
+        const spy = spyOn(Calculator.prototype, 'generateId');
+        
+        // Definimos la secuencia de respuestas para llamadas sucesivas.
+        spy.and.returnValues('ID_A', 'ID_B', 'ID_C');
+
+        expect(calculadora.generateId()).toBe('ID_A'); // 1ª llamada
+        expect(calculadora.generateId()).toBe('ID_B'); // 2ª llamada
+        expect(calculadora.generateId()).toBe('ID_C'); // 3ª llamada
+        expect(calculadora.generateId()).toBeUndefined(); // 4ª llamada (ya no hay valores definidos, devuelve undefined)
+    });
+});
