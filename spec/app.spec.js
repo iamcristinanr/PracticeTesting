@@ -214,3 +214,28 @@ describe('SUITE 9: Controlando el resultado: Return Values', function() {
         expect(calculadora.generateId()).toBeUndefined(); // 4ª llamada (ya no hay valores definidos, devuelve undefined)
     });
 });
+
+// ---------------------------------------------------------------------------------
+// SUITE 10: CONTROL DE ERRORES Y AISLAMIENTO: throwError
+// ---------------------------------------------------------------------------------
+describe('SUITE 10: Control de Errores y Aislamiento: throwError', function() {
+    let calculadora;
+    beforeEach(function() {
+        calculadora = new Calculator();
+    });
+
+    // .and.throwError("Mensaje de error")
+    // Fuerza a la función a lanzar una excepción inmediatamente al ser llamada.
+    // Es la mejor forma de testear tus bloques try...catch.
+    it('debería simular un error con .and.throwError()', function() {
+        // Espiamos el método 'divide' y forzamos que lance un error.
+        spyOn(Calculator.prototype, 'divide').and.throwError('ERROR_SIMULADO');
+
+        // Para probar errores, envolvemos la llamada en una función anónima.
+        // El matcher 'toThrowError' verifica que la excepción fue lanzada y puede
+        // opcionalmente comprobar el mensaje.
+        expect(function() {
+            calculadora.divide(10, 2);
+        }).toThrowError('ERROR_SIMULADO');
+    });
+});
