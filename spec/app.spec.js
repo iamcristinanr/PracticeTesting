@@ -1,7 +1,15 @@
 // spec/app.spec.js
 
+// =================================================================================
+// ARCHIVO TUTORIAL COMPLETO DE JASMINE
+// Este archivo contiene demostraciones de los conceptos clave de Jasmine.
+// =================================================================================
+
+
+// ---------------------------------------------------------------------------------
+// FUNCIÓN A PROBAR
+// ---------------------------------------------------------------------------------
 function calculate(expression) {
-    // ... (código de la función sin cambios)
     try {
         const sanitizedExpression = expression.replace(/[^0-9+\-*/%.()]/g, '');
         if (!sanitizedExpression) return '0';
@@ -14,62 +22,105 @@ function calculate(expression) {
     }
 }
 
-// ... (Suites de pruebas anteriores)
-describe('Función calculate()', function() { /* ... */ });
-describe('Demostración de Matchers de Jasmine', function() { /* ... */ });
-describe('Prueba del Matcher Personalizado "toBeCalculatorResult"', function() { /* ... */ });
-describe('Demostración del Ciclo de Vida (Setup y Teardown)', function() { /* ... */ });
-describe('Demostración de Pruebas del DOM', function() { /* ... */ });
+
+// ---------------------------------------------------------------------------------
+// SUITE 1: SUITES ANIDADAS (Nested Describes)
+// Organiza los tests en grupos lógicos para mayor claridad.
+// ---------------------------------------------------------------------------------
+describe('SUITE 1: Función calculate() con Suites Anidadas', function() {
+  describe('cuando realiza operaciones aritméticas básicas', function() {
+    it('debería devolver el resultado correcto para la suma', function() { expect(calculate('2+2')).toBe('4'); });
+  });
+  describe('cuando maneja casos límite y errores', function() {
+    describe('para operaciones matemáticamente indefinidas', function() {
+      it('debería devolver "Error" al dividir por cero', function() { expect(calculate('5/0')).toBe('Error'); });
+    });
+  });
+});
 
 
-// --- NUEVA SUITE: DEMOSTRACIÓN DEL USO DE 'this' ---
-// Nota: Usamos 'function()' en lugar de '() =>' para que 'this' funcione correctamente.
-describe('Demostración del uso de "this" para compartir estado', function() {
+// ---------------------------------------------------------------------------------
+// SUITE 2: DEMOSTRACIÓN DE MATCHERS
+// Los matchers son las funciones que realizan las comparaciones en los tests.
+// ---------------------------------------------------------------------------------
+describe('SUITE 2: Demostración de Matchers de Jasmine', function() {
+    it('toBe: Comprueba igualdad estricta (===)', function() { expect('a').toBe('a'); });
+    it('toEqual: Compara el contenido de objetos o arrays', function() { expect({ a: 1 }).toEqual({ a: 1 }); });
+    it('toBeTruthy / toBeFalsy: Evalúa si un valor es verdadero o falso en un contexto booleano', function() { expect(1).toBeTruthy(); expect(0).toBeFalsy(); });
+    it('not: Niega cualquier matcher', function() { expect('a').not.toBe('b'); });
+    it('toContain: Verifica si un elemento está en un array o una subcadena en un string', function() { expect(['a', 'b']).toContain('a'); });
+    it('toBeDefined / toBeUndefined: Verifica si una variable está definida o no', function() { let a = 1; let b; expect(a).toBeDefined(); expect(b).toBeUndefined(); });
+    it('toBeNull: Verifica si un valor es estrictamente null', function() { let a = null; expect(a).toBeNull(); });
+    it('toBeNaN: Verifica si un valor es Not-a-Number', function() { expect(parseInt('abc')).toBeNaN(); });
+    it('toMatch: Compara un string contra una expresión regular', function() { expect('a@b.com').toMatch(/@/); });
+    it('toThrow: Verifica si una función lanza un error', function() { const err = () => { throw new Error(); }; expect(err).toThrow(); });
+});
 
-  // En beforeEach, adjuntamos propiedades a 'this'.
-  // 'this' actúa como un objeto compartido para toda la suite.
+
+// ---------------------------------------------------------------------------------
+// SUITE 3: MATCHER PERSONALIZADO
+// Permite crear tus propias funciones de aserción para tests más legibles.
+// ---------------------------------------------------------------------------------
+describe('SUITE 3: Prueba del Matcher Personalizado "toBeCalculatorResult"', function() {
+  beforeEach(function() { jasmine.addMatchers(customMatchers); });
+  it('debería validar un resultado numérico y el de "Error"', function() {
+    expect(calculate('10 / 2')).toBeCalculatorResult();
+    expect(calculate('5 / 0')).toBeCalculatorResult();
+    expect('abc').not.toBeCalculatorResult();
+  });
+});
+
+
+// ---------------------------------------------------------------------------------
+// SUITE 4: CICLO DE VIDA (Setup y Teardown)
+// Funciones que se ejecutan antes y después de los tests para preparar y limpiar el entorno.
+// ---------------------------------------------------------------------------------
+describe('SUITE 4: Demostración del Ciclo de Vida', function() {
+  let contador = 0;
+  beforeAll(function() { console.log('CICLO DE VIDA: beforeAll - Se ejecuta una vez al inicio de la suite.'); });
+  afterAll(function() { console.log('CICLO DE VIDA: afterAll - Se ejecuta una vez al final de la suite.'); });
+  beforeEach(function() { contador = 1; console.log('CICLO DE VIDA: beforeEach - Se ejecuta antes de cada test.'); });
+  afterEach(function() { console.log('CICLO DE VIDA: afterEach - Se ejecuta después de cada test.'); });
+  
+  it('modifica el contador', function() { contador++; expect(contador).toBe(2); });
+  it('el contador es reseteado a 1 por beforeEach', function() { expect(contador).toBe(1); });
+});
+
+
+// ---------------------------------------------------------------------------------
+// SUITE 5: PRUEBAS DEL DOM Y USO DE 'this'
+// Cómo crear elementos, probarlos y usar 'this' para compartir estado.
+// ---------------------------------------------------------------------------------
+describe('SUITE 5: Pruebas del DOM y uso de "this"', function() {
   beforeEach(function() {
-    // Creamos una propiedad 'valor' en el contexto 'this' de la suite.
-    this.valor = 10;
-
-    // También podemos adjuntar elementos del DOM.
-    this.miElemento = document.createElement('p');
-    this.miElemento.innerText = 'Texto original';
-    document.body.appendChild(this.miElemento);
+    this.miDiv = document.createElement('div');
+    this.miDiv.innerText = 'Hola';
+    document.body.appendChild(this.miDiv);
   });
-
-  // En afterEach, limpiamos lo que creamos en 'this'.
   afterEach(function() {
-    // Eliminamos el elemento del DOM.
-    document.body.removeChild(this.miElemento);
-    // Es buena práctica limpiar las propiedades de 'this'.
-    this.valor = 0;
-    this.miElemento = null;
+    document.body.removeChild(this.miDiv);
   });
-
-  // En el test, accedemos a las propiedades directamente desde 'this'.
-  // No necesitamos declarar variables 'let' al inicio del 'describe'.
-  it('debería poder acceder a las propiedades adjuntas a "this"', function() {
-    // Verificamos el valor de la propiedad que establecimos en beforeEach.
-    expect(this.valor).toBe(10);
+  it('debería crear un elemento y acceder a él con "this"', function() {
+    expect(this.miDiv.parentNode).toBe(document.body);
+    expect(this.miDiv.innerText).toBe('Hola');
   });
+});
 
-  it('debería poder modificar las propiedades de "this" dentro de un test', function() {
-    // Modificamos el valor solo para este test.
-    this.valor = 20;
-    expect(this.valor).toBe(20);
 
-    // El siguiente test tendrá un 'valor' de 10 de nuevo, gracias al beforeEach.
+// ---------------------------------------------------------------------------------
+// SUITE 6: SPIES
+// "Espías" que interceptan llamadas a funciones para probar interacciones.
+// ---------------------------------------------------------------------------------
+const SpyLogger = { log: function(msg) { console.log(msg); } };
+const SpyCalculator = { addAndLog: function(a, b) { SpyLogger.log(`R: ${a+b}`); return a+b; } };
+
+describe('SUITE 6: Demostración de Spies', function() {
+  beforeEach(function() {
+    spyOn(SpyLogger, 'log');
   });
-
-  it('debería poder acceder a los elementos del DOM adjuntos a "this"', function() {
-    // No necesitamos hacer un querySelector, ya tenemos la referencia en 'this.miElemento'.
-    // Esto es más eficiente.
-    expect(this.miElemento.innerText).toBe('Texto original');
-
-    // Modificamos el elemento
-    this.miElemento.innerText = 'Texto modificado';
-    expect(this.miElemento.innerText).toBe('Texto modificado');
+  it('debería espiar la llamada al logger', function() {
+    SpyCalculator.addAndLog(7, 8);
+    expect(SpyLogger.log).toHaveBeenCalledWith('R: 15');
+    expect(SpyLogger.log).toHaveBeenCalledTimes(1);
   });
-
 });
