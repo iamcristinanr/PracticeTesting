@@ -152,3 +152,27 @@ describe('SUITE 6: Demostración de Spies', function() {
         });
     });
 });
+
+// ---------------------------------------------------------------------------------
+// SUITE 8: SPYING CON IMPLEMENTACIÓN REAL: and.callThrough()
+// ---------------------------------------------------------------------------------
+describe('SUITE 8: Spying con Implementación Real: and.callThrough()', function() {
+    // ¿Qué es callThrough?
+    // Por defecto, un Spy reemplaza la función original. and.callThrough() permite que, además de espiar, la función original se ejecute.
+    
+    beforeEach(function() {
+        // Creamos un espía en el prototipo y le decimos que también ejecute la función real.
+        spyOn(Calculator.prototype, 'multiply').and.callThrough();
+    });
+
+    it('debería espiar y a la vez ejecutar la implementación real del prototipo', function() {
+        const calc = new Calculator();
+        const result = calc.multiply(5, 5);
+
+        // Verificamos que el espía en el prototipo fue llamado con los argumentos correctos.
+        expect(Calculator.prototype.multiply).toHaveBeenCalledWith(5, 5);
+
+        // Y también verificamos que la función original se ejecutó, devolviendo el resultado correcto.
+        expect(result).toBe(25);
+    });
+});
